@@ -15,7 +15,7 @@
 #endif
 #include <cerrno>
 #if BOOST_LEAF_CFG_WIN32
-#   include <Windows.h>
+#   include <windows.h>
 #   include <cstring>
 #   ifdef min
 #       undef min
