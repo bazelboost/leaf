@@ -17,3 +17,10 @@ subprojects/*/
 benchmark/tl/*
 test/leaf.hpp
 doc/leaf.html
+
+# Bazel
+/bazel-*
+/external
+/.cache
+/compile_commands.json
+user.bazelrc
