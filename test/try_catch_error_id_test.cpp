@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -38,11 +37,11 @@ int main()
     int r = leaf::try_catch(
         []() -> int
         {
-            throw leaf::exception( my_error(), info{42} );
+            leaf::throw_exception( my_error(), info{42} );
         },
-        []( my_error const & x, leaf::catch_<leaf::error_id> id )
+        []( my_error const &, leaf::catch_<leaf::error_id> id )
         {
-            BOOST_TEST(dynamic_cast<leaf::error_id const *>(&id.matched)!=0 && dynamic_cast<leaf::error_id const *>(&id.matched)->value()==1);
+            BOOST_TEST(dynamic_cast<leaf::error_id const *>(&id.matched) != 0 && dynamic_cast<leaf::error_id const *>(&id.matched)->value() == 5);
             return 1;
         },
         []

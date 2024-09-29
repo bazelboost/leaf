@@ -1,15 +1,26 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#define BOOST_LEAF_NO_EXCEPTIONS
+#ifndef BOOST_LEAF_NO_EXCEPTIONS
+#   define BOOST_LEAF_NO_EXCEPTIONS
+#endif
+
+#ifdef BOOST_LEAF_CFG_STD_SYSTEM_ERROR
+#   undef BOOST_LEAF_CFG_STD_SYSTEM_ERROR
+#endif
 #define BOOST_LEAF_CFG_STD_SYSTEM_ERROR 0
-#define BOOST_LEAF_CFG_STD_STRING 0
+
 #ifdef BOOST_LEAF_CFG_DIAGNOSTICS
 #   undef BOOST_LEAF_CFG_DIAGNOSTICS
 #endif
 #define BOOST_LEAF_CFG_DIAGNOSTICS 0
+
+#ifdef BOOST_LEAF_CFG_CAPTURE
+#   undef BOOST_LEAF_CFG_CAPTURE
+#endif
+#define BOOST_LEAF_CFG_CAPTURE 0
+
 #define BOOST_LEAF_USE_TLS_ARRAY
 #define BOOST_LEAF_CFG_TLS_ARRAY_SIZE 64
 #define BOOST_LEAF_CFG_TLS_ARRAY_START_INDEX 10

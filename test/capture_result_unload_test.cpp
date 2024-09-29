@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,9 +19,9 @@ int main()
 #ifdef BOOST_LEAF_TEST_SINGLE_HEADER
 #   include "leaf.hpp"
 #else
-#   include <boost/leaf/capture.hpp>
 #   include <boost/leaf/result.hpp>
 #   include <boost/leaf/handle_errors.hpp>
+#   include <boost/leaf/on_error.hpp>
 #endif
 
 #include "_test_ec.hpp"
@@ -126,8 +125,7 @@ int main()
 {
     test( []
     {
-        return leaf::capture(
-            std::make_shared<leaf::leaf_detail::polymorphic_context_impl<leaf::context<info<1>, info<2>, info<3>>>>(),
+        return leaf::try_capture_all(
             []() -> leaf::result<int>
             {
                 return leaf::new_error(errc_a::a0, info<1>{1}, info<3>{3});
@@ -136,11 +134,30 @@ int main()
 
     test( []
     {
-        return leaf::capture(
-            std::make_shared<leaf::leaf_detail::polymorphic_context_impl<leaf::context<info<1>, info<2>, info<3>>>>(),
+        return leaf::try_capture_all(
             []() -> leaf::result<void>
             {
                 return leaf::new_error(errc_a::a0, info<1>{1}, info<3>{3});
+            } );
+     } );
+
+    test( []
+    {
+        return leaf::try_capture_all(
+            []() -> leaf::result<int>
+            {
+                auto load = leaf::on_error(errc_a::a0, info<1>{1}, info<3>{3});
+                return leaf::new_error();
+            } );
+     } );
+
+    test( []
+    {
+        return leaf::try_capture_all(
+            []() -> leaf::result<void>
+            {
+                auto load = leaf::on_error(errc_a::a0, info<1>{1}, info<3>{3});
+                return leaf::new_error();
             } );
      } );
 

@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -33,7 +32,7 @@ int main()
     auto error_handlers = std::make_tuple(
         []( info<1> x )
         {
-            BOOST_TEST(x.value==1);
+            BOOST_TEST_EQ(x.value, 1);
             return 1;
         },
         []
@@ -45,13 +44,13 @@ int main()
         [&]
         {
             auto ctx = leaf::make_context(error_handlers);
-            leaf::result<int> r;
+            leaf::result<int> r1;
             {
                 auto active_context = activate_context(ctx);
-                r = f(ctx);
+                r1 = f(ctx);
             }
-            ctx.propagate(r.error());
-            return r;
+            ctx.unload(r1.error());
+            return r1;
         },
         error_handlers );
     BOOST_TEST_EQ(r, 1);

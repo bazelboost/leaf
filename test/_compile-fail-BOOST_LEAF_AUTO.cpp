@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -16,15 +15,6 @@ struct my_result
     std::error_code error();
     explicit operator bool() const;
 };
-
-#if 0
-namespace boost { namespace leaf {
-    template <class T>
-    struct is_result_type<my_result<T>>: std::true_type
-    {
-    };
-} }
-#endif
 
 my_result<int> f();
 

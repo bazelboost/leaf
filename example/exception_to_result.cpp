@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -68,12 +67,12 @@ int main()
                 return { };
             },
 
-            []( error_a const & e )
+            []( error_a const & )
             {
                 std::cerr << "Error A!" << std::endl;
             },
 
-            []( error_b const & e )
+            []( error_b const & )
             {
                 std::cerr << "Error B!" << std::endl;
             },

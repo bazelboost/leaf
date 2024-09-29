@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -20,7 +19,7 @@ int main()
 #ifdef BOOST_LEAF_TEST_SINGLE_HEADER
 #   include "leaf.hpp"
 #else
-#   include <boost/leaf/capture.hpp>
+#   include <boost/leaf/result.hpp>
 #   include <boost/leaf/handle_errors.hpp>
 #   include <boost/leaf/exception.hpp>
 #   include <boost/leaf/on_error.hpp>
@@ -41,13 +40,13 @@ struct fut_info
     int a;
     int b;
     int result;
-    std::future<int> fut;
+    std::future<leaf::result<int>> fut;
 };
 
-template <class H, class F>
+template <class F>
 std::vector<fut_info> launch_tasks( int task_count, F f )
 {
-    BOOST_LEAF_ASSERT(task_count>0);
+    BOOST_LEAF_ASSERT(task_count > 0);
     std::vector<fut_info> fut;
     std::generate_n( std::back_inserter(fut), task_count,
         [=]
@@ -58,7 +57,11 @@ std::vector<fut_info> launch_tasks( int task_count, F f )
             return fut_info { a, b, res, std::async( std::launch::async,
                 [=]
                 {
-                    return leaf::capture(leaf::make_shared_context<H>(), f, a, b, res);
+                    return leaf::try_capture_all(
+                        [&]
+                        {
+                            return f(a, b, res);
+                        } );
                 } ) };
         } );
     return fut;
@@ -66,9 +69,20 @@ std::vector<fut_info> launch_tasks( int task_count, F f )
 
 int main()
 {
+    int const task_count = 100;
     int received_a, received_b;
+
+    auto task =
+        []( int a, int b, int res )
+        {
+            if( res >= 0 )
+                return res;
+            else
+                leaf::throw_exception(info<1>{a}, info<2>{b}, info<3>{});
+        };
+
     auto error_handlers = std::make_tuple(
-        [&received_a, &received_b]( info<1> const & x1, info<2> const & x2, info<4> const & )
+        [&]( info<1> const & x1, info<2> const & x2, info<4> const & )
         {
             received_a = x1.value;
             received_b = x2.value;
@@ -80,15 +94,7 @@ int main()
         } );
 
     {
-        std::vector<fut_info> fut = launch_tasks<decltype(error_handlers)>(
-            100,
-            []( int a, int b, int res )
-            {
-                if( res >= 0 )
-                    return res;
-                else
-                    throw leaf::exception(info<1>{a}, info<2>{b}, info<3>{});
-            } );
+        std::vector<fut_info> fut = launch_tasks(task_count, task);
 
         for( auto & f : fut )
         {
@@ -98,9 +104,7 @@ int main()
                 [&]
                 {
                     auto load = leaf::on_error( info<4>{} );
-
-                    // Calling future_get is required in order to make the on_error (above) work.
-                    return leaf::future_get(f.fut);
+                    return f.fut.get().value();
                 },
                 error_handlers );
             if( f.result>=0 )
@@ -108,22 +112,14 @@ int main()
             else
             {
                 BOOST_TEST_EQ(r, -1);
-                BOOST_TEST_EQ(received_a, f.a);
-                BOOST_TEST_EQ(received_b, f.b);
+                BOOST_TEST_EQ(f.a, received_a);
+                BOOST_TEST_EQ(f.b, received_b);
             }
         }
     }
 
     {
-        std::vector<fut_info> fut = launch_tasks<decltype(error_handlers)>(
-            100,
-            []( int a, int b, int res )
-            {
-                if( res >= 0 )
-                    return res;
-                else
-                    throw leaf::exception(info<1>{a}, info<2>{b}, info<3>{});
-            } );
+        std::vector<fut_info> fut = launch_tasks(task_count, task);
 
         for( auto & f : fut )
         {
@@ -137,9 +133,7 @@ int main()
                     return leaf::try_catch(
                         [&]
                         {
-                            // Not calling future_get, a on_error in this scope won't work correctly.
-                            // This is to verify that the on_error in the outer scope (above) works.
-                            return f.fut.get();
+                            return f.fut.get().value();
                         },
                         []() -> int
                         {
@@ -152,8 +146,8 @@ int main()
             else
             {
                 BOOST_TEST_EQ(r, -1);
-                BOOST_TEST_EQ(received_a, f.a);
-                BOOST_TEST_EQ(received_b, f.b);
+                BOOST_TEST_EQ(f.a, received_a);
+                BOOST_TEST_EQ(f.b, received_b);
             }
         }
     }

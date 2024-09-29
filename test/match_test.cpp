@@ -1,5 +1,4 @@
-// Copyright 2018-2022 Emil Dotchevski and Reverge Studios, Inc.
-
+// Copyright 2018-2024 Emil Dotchevski and Reverge Studios, Inc.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -164,7 +163,7 @@ int main()
                 return 1;
             },
 
-            []( my_error e )
+            []( my_error )
             {
                 return 2;
             },
@@ -188,7 +187,7 @@ int main()
                 return 1;
             },
 
-            []( my_error e )
+            []( my_error )
             {
                 return 2;
             },
@@ -246,7 +245,7 @@ int main()
                 return leaf::new_error(e_my_error{42});
             },
 
-            []( leaf::match<e_my_error, e_my_error_gt<41>> m )
+            []( leaf::match<e_my_error, e_my_error_gt<41>> )
             {
                 return 1;
             },
@@ -265,7 +264,7 @@ int main()
                 return leaf::new_error(e_my_error{42});
             },
 
-            []( leaf::match<e_my_error, e_my_error_gt<42>> m )
+            []( leaf::match<e_my_error, e_my_error_gt<42>> )
             {
                 return 1;
             },
